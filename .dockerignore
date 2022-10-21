@@ -1,0 +1,11 @@
+node_modules
+uploads
+.eslintrc.js
+.gitignore
+.gitattributes
+.git
+.editorconfig
+.vscode
+README.md
+LICENSE
+.tours

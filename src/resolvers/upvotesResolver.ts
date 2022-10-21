@@ -27,7 +27,7 @@ export class UpvoteRessolver {
   async addUpvote(
     @Arg("skillId", () => ID) skillId: number,
     @Arg("wilderId", () => ID) wilderId: number,
-    @Arg("upvote", () => Int) upvote: number
+    @Arg("upvote", () => Int, { nullable: true }) upvote?: number
   ): Promise<Upvote> {
     if (skillId === undefined || wilderId === undefined) {
       throw new Error("Please enter a skill id and a wilder id");
@@ -88,8 +88,8 @@ export class UpvoteRessolver {
     }
   }
 
-  @Mutation(() => Boolean)
-  async deleteUpvote(@Arg("id", () => ID) id: number): Promise<boolean> {
+  @Mutation(() => Upvote)
+  async deleteUpvote(@Arg("id", () => ID) id: number): Promise<Upvote> {
     const upvote = await upvotesRepository.findOneBy({
       id,
     });
@@ -99,8 +99,7 @@ export class UpvoteRessolver {
     }
 
     try {
-      await upvotesRepository.delete(id);
-      return true;
+      return await upvotesRepository.remove(upvote);
     } catch (error: any) {
       throw new Error(
         `Error while trying to delete upvote because ${error.message as string}`
@@ -108,7 +107,7 @@ export class UpvoteRessolver {
     }
   }
 
-  @Mutation(() => Int)
+  @Mutation(() => Upvote)
   async upvote(@Arg("id", () => ID) id: number): Promise<Upvote> {
     const upvote = await upvotesRepository.findOneBy({
       id,

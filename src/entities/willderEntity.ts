@@ -1,4 +1,5 @@
-import { Field, ID, ObjectType } from "type-graphql";
+import { IsString, Length } from "class-validator";
+import { Field, ID, InputType, ObjectType } from "type-graphql";
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Upvote } from "./upvoteEntity";
 @ObjectType()
@@ -16,7 +17,20 @@ export class Wilder {
   @Column({ nullable: true })
   city: string;
 
-  @Field((type) => [Upvote], { nullable: true })
+  @Field(() => [Upvote], { nullable: true })
   @OneToMany(() => Upvote, "wilder")
   upvotes: Upvote[];
+}
+
+@InputType()
+export class WilderInput {
+  @IsString()
+  @Length(2, 50)
+  @Field()
+  name: string;
+
+  @IsString()
+  @Length(0, 100)
+  @Field({ nullable: true })
+  city: string;
 }

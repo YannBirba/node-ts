@@ -83,8 +83,8 @@ export class SkillResolver {
     }
   }
 
-  @Mutation(() => Boolean)
-  async deleteSkill(@Arg("id", () => ID) id: number): Promise<boolean> {
+  @Mutation(() => Skill)
+  async deleteSkill(@Arg("id", () => ID) id: number): Promise<Skill> {
     const skill = await skillsRepository.findOneBy({
       id,
     });
@@ -93,8 +93,7 @@ export class SkillResolver {
     }
 
     try {
-      await skillsRepository.delete(id);
-      return true;
+      return await skillsRepository.remove(skill);
     } catch (error: any) {
       throw new Error(
         `Error while trying to delete a skill  because ${

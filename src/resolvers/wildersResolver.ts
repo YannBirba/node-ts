@@ -1,5 +1,5 @@
 import { Arg, ID, Mutation, Query, Resolver } from "type-graphql";
-import { Wilder } from "../entities/willderEntity";
+import { Wilder, WilderInput } from "../entities/willderEntity";
 import { wildersRepository } from "../repositories/wildersRepository";
 
 @Resolver()
@@ -25,20 +25,17 @@ export class WilderResolver {
 
   @Mutation(() => Wilder)
   async addWilder(
-    @Arg("name") name: string,
-    @Arg("city", { nullable: true }) city: string
+    @Arg("data", { nullable: true }) { name, city }: WilderInput
   ): Promise<Wilder> {
     if (name === undefined) {
       throw new Error("Please enter a name");
     }
     try {
-      const wilder = await wildersRepository.create({ name, city });
+      const wilder = wildersRepository.create({ name, city });
       return await wildersRepository.save(wilder);
     } catch (error: any) {
       throw new Error(
-        `Error while trying to add a wilder because ${
-          error.message as string
-        }`
+        `Error while trying to add a wilder because ${error.message as string}`
       );
     }
   }
@@ -46,8 +43,7 @@ export class WilderResolver {
   @Mutation(() => Wilder, { nullable: true })
   async editWilder(
     @Arg("id", () => ID) id: number,
-    @Arg("name", { nullable: true }) name: string,
-    @Arg("city", { nullable: true }) city: string
+    @Arg("data", { nullable: true }) { name, city }: WilderInput
   ): Promise<Wilder | null> {
     if (name === undefined && city === undefined) {
       throw new Error("Please enter a name or a city");
@@ -64,15 +60,13 @@ export class WilderResolver {
       return await wildersRepository.save(wilder);
     } catch (error: any) {
       throw new Error(
-        `Error while trying to edit a wilder because ${
-          error.message as string
-        }`
+        `Error while trying to edit a wilder because ${error.message as string}`
       );
     }
   }
 
-  @Mutation(() => Boolean)
-  async deleteWilder(@Arg("id", () => ID) id: number): Promise<boolean> {
+  @Mutation(() => Wilder)
+  async deleteWilder(@Arg("id", () => ID) id: number): Promise<Wilder> {
     const wilder = await wildersRepository.findOneBy({
       id,
     });
@@ -80,8 +74,7 @@ export class WilderResolver {
       throw new Error(`No existing wilder for the id : ${id}`);
     }
     try {
-      await wildersRepository.delete(id);
-      return true;
+      return await wildersRepository.remove(wilder);
     } catch (error: any) {
       throw new Error(
         `Error while trying to delete a wilder because ${
